@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-lc18lptp!=5+n_m$fkanzz-&$u3a0zx@)m3_impk%l5&-%i*4s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['group-portal-ik6b.onrender.com']
+ALLOWED_HOSTS = ['group-portal-ik6b.onrender.com', '*']
 
 
 # Application definition
