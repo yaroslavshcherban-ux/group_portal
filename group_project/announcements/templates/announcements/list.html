@@ -1,21 +1,24 @@
 {% extends 'announcements/base.html' %}
 
-{% block title %}Объявления{% endblock %}
+{% block title %}Оголошення{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-8">
-        <h1>Объявления</h1>
+        <h1><i class="fas fa-bullhorn me-2"></i>Оголошення</h1>
 
-        <!-- Поиск и фильтры -->
+        <!-- Пошук і фільтри -->
         <form method="get" class="mb-4">
             <div class="row g-3">
                 <div class="col-md-4">
-                    <input type="text" name="q" class="form-control" placeholder="Поиск..." value="{{ query }}">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" name="q" class="form-control" placeholder="Пошук оголошень..." value="{{ query|default:'' }}">
+                    </div>
                 </div>
                 <div class="col-md-3">
                     <select name="category" class="form-select">
-                        <option value="">Все категории</option>
+                        <option value="">Всі категорії</option>
                         {% for category in categories %}
                             <option value="{{ category.id }}" {% if category.id|stringformat:"s" == selected_category %}selected{% endif %}>{{ category.name }}</option>
                         {% endfor %}
@@ -23,63 +26,133 @@
                 </div>
                 <div class="col-md-3">
                     <select name="status" class="form-select">
-                        <option value="">Все статусы</option>
-                        <option value="active" {% if status == 'active' %}selected{% endif %}>Активные</option>
-                        <option value="expired" {% if status == 'expired' %}selected{% endif %}>Истекшие</option>
+                        <option value="">Всі статуси</option>
+                        <option value="active" {% if status == 'active' %}selected{% endif %}>Активні</option>
+                        <option value="expired" {% if status == 'expired' %}selected{% endif %}>Закінчилися</option>
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">Фильтр</button>
+                    <button type="submit" class="btn btn-primary w-100 filter-btn {% if filtered %}active{% endif %}">
+                        <i class="fas fa-filter me-1"></i>Фільтр
+                    </button>
                 </div>
             </div>
         </form>
 
-        <!-- Список объявлений -->
-        {% for announcement in announcements %}
-            <div class="card mb-3 {% if announcement.is_pinned %}border-warning{% endif %}">
-                <div class="card-body">
-                    {% if announcement.is_pinned %}
-                        <span class="badge bg-warning text-dark">Закреплено</span>
-                    {% endif %}
-                    <h5 class="card-title">{{ announcement.title }}</h5>
-                    <p class="card-text">{{ announcement.content|truncatechars:200 }}</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <small class="text-muted">
-                            Категория: {{ announcement.category.name }} |
-                            Автор: {{ announcement.author.username }} |
-                            Создано: {{ announcement.created_at|date:"d.m.Y H:i" }}
-                            {% if announcement.end_date %}
-                                | Истекает: {{ announcement.end_date|date:"d.m.Y" }}
-                            {% endif %}
-                        </small>
-                        {% if user.is_authenticated and user.groups.filter(name='Admin').exists %}
-                            <div>
-                                <a href="{% url 'announcement_edit' announcement.pk %}" class="btn btn-sm btn-outline-primary">Редактировать</a>
-                                <a href="{% url 'announcement_delete' announcement.pk %}" class="btn btn-sm btn-outline-danger">Удалить</a>
+        <!-- Список оголошень -->
+        {% if announcements %}
+            {% for announcement in announcements %}
+                <div class="card mb-3 announcement-card {% if announcement.is_pinned %}border-warning{% endif %}">
+                    <div class="card-body">
+                        {% if announcement.is_pinned %}
+                            <span class="badge bg-warning text-dark">
+                                <i class="fas fa-thumbtack me-1"></i>Закріплено
+                            </span>
+                        {% endif %}
+                        {% if announcement.image %}
+                            <div class="mb-2">
+                                <img src="{{ announcement.image.url }}" alt="Зображення оголошення" class="img-fluid rounded w-100" style="max-height:350px;object-fit:cover;">
                             </div>
                         {% endif %}
+                        <h5 class="card-title"><a href="{% url 'announcement_detail' announcement.pk %}" class="text-decoration-none">{{ announcement.title }}</a></h5>
+                        <p class="card-text">{{ announcement.content|truncatechars:200 }}</p>
+                        <a href="{% url 'announcement_detail' announcement.pk %}" class="btn btn-read-more btn-sm mb-2">Читати більше</a>
+                        {% if announcement.file %}
+                            <p class="card-text">
+                                <a href="{{ announcement.file.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-download me-1"></i>Завантажити файл
+                                </a>
+                            </p>
+                        {% endif %}
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                Категорія: <span class="category {% if announcement.category.id|stringformat:'s' == selected_category %}active{% endif %}">{{ announcement.category.name }}</span> |
+                                Автор: {{ announcement.author.username }} |
+                                Створено: {{ announcement.created_at|date:"d.m.Y H:i" }}
+                                {% if announcement.end_date %}
+                                    | Закінчується: {{ announcement.end_date|date:"d.m.Y" }}
+                                {% endif %} | 
+                                <span class="like-btn {% if user in announcement.likes.all %}liked{% endif %}" data-id="{{ announcement.pk }}">
+                                    <i class="fas fa-heart"></i> {{ announcement.likes.count }}
+                                </span>
+                            </small>
+                            {% if is_admin %}
+                                <div>
+                                    <a href="{% url 'announcement_edit' announcement.pk %}" class="btn btn-sm btn-outline-primary me-1">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'announcement_delete' announcement.pk %}" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox fa-2x mb-2"></i><br>
+                Нічого не знайдено 😢
             </div>
-        {% empty %}
-            <p>Нет объявлений.</p>
-        {% endfor %}
+        {% endif %}
+
+        <!-- Пагинация -->
+        {% if announcements.has_other_pages %}
+            <nav aria-label="Пагинация оголошень">
+                <ul class="pagination justify-content-center">
+                    {% if announcements.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if status %}status={{ status }}&{% endif %}page=1">Перша</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if status %}status={{ status }}&{% endif %}page={{ announcements.previous_page_number }}">Попередня</a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in announcements.paginator.page_range %}
+                        {% if announcements.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > announcements.number|add:'-3' and num < announcements.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if status %}status={{ status }}&{% endif %}page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if announcements.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if status %}status={{ status }}&{% endif %}page={{ announcements.next_page_number }}">Наступна</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if status %}status={{ status }}&{% endif %}page={{ announcements.paginator.num_pages }}">Остання</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
     </div>
 
     <div class="col-md-4">
-        {% if user.is_authenticated and user.groups.filter(name='Admin').exists %}
-            <a href="{% url 'announcement_create' %}" class="btn btn-success mb-3">Создать объявление</a>
+        {% if is_admin %}
+            <a href="{% url 'announcement_create' %}" class="btn btn-success mb-3">
+                <i class="fas fa-plus me-1"></i>Створити оголошення
+            </a>
         {% endif %}
 
-        <!-- Категории -->
+        <!-- Категорії -->
         <div class="card">
-            <div class="card-header">Категории</div>
+            <div class="card-header">Категорії</div>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item">
-                    <a href="{% url 'announcement_list' %}" class="text-decoration-none">Все</a>
+                <li class="list-group-item{% if not selected_category %} active-category{% endif %}">
+                    <span class="category-icon">📋</span>
+                    <a href="{% url 'announcement_list' %}" class="text-decoration-none">Всі</a>
                 </li>
                 {% for category in categories %}
-                    <li class="list-group-item">
+                    <li class="list-group-item{% if category.id|stringformat:'s' == selected_category %} active-category{% endif %}">
+                        <span class="category-icon">
+                            {% if category.name|lower == 'новини' %}📢{% elif category.name|lower == 'події' %}📅{% elif category.name|lower == 'важливо' %}❗{% else %}📂{% endif %}
+                        </span>
                         <a href="?category={{ category.id }}" class="text-decoration-none">{{ category.name }}</a>
                     </li>
                 {% endfor %}

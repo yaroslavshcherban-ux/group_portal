@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Announcement, Category
+from .models import Announcement, Category, Comment
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -11,3 +11,9 @@ class AnnouncementAdmin(admin.ModelAdmin):
     list_filter = ['category', 'is_pinned', 'created_at', 'end_date']
     search_fields = ['title', 'content']
     ordering = ['-is_pinned', '-created_at']
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ['announcement', 'author', 'created_at']
+    list_filter = ['created_at']
+    search_fields = ['content']

@@ -1,0 +1,133 @@
+/* Активний лінк категорії (sidebar) */
+.list-group-item .active,
+.list-group-item .text-decoration-none.active {
+    color: #7c5cff !important;
+    font-weight: 700;
+    text-shadow: 0 1px 6px #7c5cff22;
+}
+.navbar-nav .nav-link, .navbar-nav .btn {
+    border: 1.5px solid #0d6efd;
+    background: rgba(255,255,255,0.25);
+    color: #0d6efd !important;
+    border-radius: 0.5rem;
+    margin-left: 0.5rem;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    font-weight: 500;
+}
+.navbar-nav .nav-link:hover, .navbar-nav .btn:hover {
+    background: rgba(13,110,253,0.12);
+    color: #084298 !important;
+    box-shadow: 0 2px 12px 0 rgba(13,110,253,0.08);
+}
+
+/* Glass/glow effect for navbar buttons */
+.navbar-nav .nav-link, .navbar-nav .btn {
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 12px 0 rgba(13,110,253,0.08);
+}
+.navbar-nav .nav-link:hover, .navbar-nav .btn:hover {
+    box-shadow: 0 0 12px 2px #7c5cff44, 0 2px 12px 0 rgba(13,110,253,0.08);
+    background: rgba(124,92,255,0.13);
+}
+
+/* Card hover effect + animation */
+.card.announcement-card {
+    transition: box-shadow 0.3s, transform 0.3s;
+    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.07);
+    animation: fadeInUp 0.5s ease;
+}
+.card.announcement-card:hover {
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    transform: translateY(-6px) scale(1.01);
+}
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Active category highlight (sidebar) */
+.list-group-item.active-category {
+    background: rgba(255,255,255,0.1);
+    color: #7c5cff;
+    font-weight: 600;
+    border-left: 3px solid #7c5cff;
+    transition: background 0.2s, border 0.2s;
+}
+
+/* Active category (inline, e.g. .category.active) */
+.category.active {
+    background: rgba(255,255,255,0.1);
+    border-left: 3px solid #7c5cff;
+    color: #7c5cff;
+}
+/* Filter button active state */
+.filter-btn.active, .btn-filter.active {
+    background: linear-gradient(45deg, #6a5cff, #9f7aea) !important;
+    color: #fff !important;
+    border: none;
+    box-shadow: 0 0 8px #7c5cff55;
+}
+
+/* Читати більше button improved */
+.btn-read-more {
+    border: 1.5px solid #7c5cff;
+    color: #7c5cff;
+    background: rgba(255,255,255,0.15);
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+.btn-read-more:hover {
+    background: linear-gradient(90deg, #7c5cff 0%, #9f7aea 100%);
+    color: #fff;
+    box-shadow: 0 2px 12px 0 #7c5cff33;
+}
+
+/* Skeleton loading */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+    background-size: 400% 100%;
+    animation: skeleton-loading 1.2s ease-in-out infinite;
+    border-radius: 0.5rem;
+    min-height: 120px;
+}
+@keyframes skeleton-loading {
+    0% { background-position: 100% 50%; }
+    100% { background-position: 0 50%; }
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    color: #aaa;
+    font-size: 1.2rem;
+    margin: 2rem 0;
+}
+
+/* AJAX like button */
+.like-btn {
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+}
+.like-btn.liked {
+    color: #e53e3e;
+    transform: scale(1.2);
+}
+
+/* Category icons */
+.category-icon {
+    margin-right: 0.5em;
+}
+
+/* Fix search input None bug */
+input[type="text"][value="None"] {
+    color: #aaa;
+}
